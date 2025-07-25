@@ -1,0 +1,72 @@
+cidl: "0.9"
+info:
+  name: anchor_escrow
+  title: Escrow
+  version: 0.1.0
+  summary: |-
+    Escrow program that defined two methods. One for making the 
+    escrow contract and another for taking it.
+  license:
+    name: MIT
+    identifier: MIT
+solana:
+    seed:
+        EscrowPDA:
+            items:
+                - name: "escrow"
+                - name: maker_key
+                  type: sol:pubkey
+                - name: seed
+                  type: u64  
+types:
+  EscrowAccount:
+    summary: EscrowAccount stores the agrement terms of a simple exchange between two perties.
+    fields:
+      - name: seed
+        type: u64
+      - name: maker
+        type: sol:pubkey
+      - name: mint_a
+        type: sol:pubkey
+      - name: mint_b
+        type: sol:pubkey
+      - name: recieve_amount
+        type: u64
+      - name: expiry
+        type: u64
+      - name: is_mutable
+        type: bool
+      - name: escrow_bump
+        type: u8
+      - name: vault_bump
+        type: u8
+methods:
+  - name: make
+    inputs:
+      - name: escrow
+        type: sol:account<EscrowAccount>
+        attributes: [ sol:writable, sol:init]
+      - name: seed
+        type: u64 
+      - name: mint_a
+        type: sol:account<csl_spl_token.Mint>        
+      - name: mint_b
+        type: sol:account<csl_spl_token.Mint>  
+      - name: maker_ata
+        type: sol:account<csl_spl_token.Account, csl_spl_token.seeds.Account(wallet=maker, token_program=token_program, mint=mint_a)>
+        attributes: [ sol:writable ] 
+      - name: vault
+        type: sol:account<csl_spl_token.Account, csl_spl_token.seeds.Account(token_program=token_program, mint=mint_a)>
+        attributes: [ sol:init ]
+      - name: system_program
+        type: sol:account
+        description: System program
+        attributes: [ sol:address=11111111111111111111111111111111 ]
+      - name: token_program
+        type: sol:account
+        description: SPL Token program
+        attributes: [ sol:address=TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA ]
+    signers:
+      - name: maker
+        type: sol:account
+        attributes: [ sol:writable ]
